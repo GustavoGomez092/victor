@@ -44,7 +44,6 @@ export default class Components extends React.Component {
           <CardHeader id='toggler' className='d-flex'><h2>Home</h2></CardHeader>
           <CardBody className='p-0'>
             <UncontrolledCollapse toggler="#toggler">
-            {console.log(this.state.compo)}
               {
                 this.state.compo.map( x => (
                   <Card key={x.id}>
