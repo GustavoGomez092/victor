@@ -5,8 +5,6 @@ import {
   Row,
   Col,
   Card,
-  CardBody,
-  Input,
   Button
 } from 'reactstrap';
 import { db, fs } from '../utils/firebaseInit'
@@ -39,11 +37,16 @@ export default class Preview extends React.Component {
     await this.setState({ dataReceived: data })
   }
 
+  sendTemplate() {
+    chrome.runtime.sendMessage({ msg: this.state.templates });
+  }
+
   render() {
     return (
       <React.Fragment>
-        <Navbar color="light" light expand="md" color='warning'>
+        <Navbar className='d-block' light expand="md" color='warning'>
           <NavbarBrand className='text-white'>Preview</NavbarBrand>
+          <Button color='success' className='float-right' onClick={() => this.sendTemplate()}>Add To Page</Button>
         </Navbar>
         <Row>
           <Col>
@@ -55,7 +58,7 @@ export default class Preview extends React.Component {
                   ))
                   : null
               }
-              <Button onClick={() => this.removeComponent()}>Pop</Button>
+              <Button onClick={() => this.removeComponent()}>Remove last</Button>
             </Card>
           </Col>
         </Row>

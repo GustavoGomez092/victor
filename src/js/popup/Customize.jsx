@@ -20,11 +20,8 @@ export default class Description extends React.Component {
       data: null,
       variables: null,
       currentPicked: null,
-      defaultColors: ['#D9E3F0', '#F47373', '#697689', '#37D67A', '#2CCCE4', '#555555', '#dce775', '#ff8a65', '#ba68c8']
-    },
-    this.handleChange = (color) => {
-      this.setState({ currentPicked: color.hex })
-    };
+      pallete: ['#D9E3F0', '#F47373', '#697689', '#37D67A', '#2CCCE4', '#555555', '#dce775', '#ff8a65', '#ba68c8']
+    }
   }
 
   async getDoc() {
@@ -64,8 +61,6 @@ export default class Description extends React.Component {
     return names
   }
 
-
-
   sender() {
     let { data, variables } = this.state
     let regex = /\${(.*?)}/g
@@ -76,13 +71,11 @@ export default class Description extends React.Component {
     this.props.customized(data.id, component, data.previewPicture[0].id)
   }
 
-  updateIt(data){
-    document.querySelector(data).value = this.state.currentPicked.split('#').join('') 
-    if(!this.state.defaultColors.includes(this.state.currentPicked)){
-      this.setState({
-        defaultColors: [...this.state.defaultColors, this.state.currentPicked]
-      })
-    }
+  async handleColor (hex, data) {
+    let { pallete } = this.state
+    !pallete.includes(hex)
+      ? await this.setState({ variables: { ...this.state.variables, [data]: hex }, pallete: [...pallete, hex] })
+      : await this.setState({ variables: { ...this.state.variables, [data]: hex } })
   }
 
   hoverIn(data){
@@ -121,22 +114,26 @@ export default class Description extends React.Component {
                           onMouseEnter={()=>this.hoverIn(`.picker${u[0]}`)}
                             onMouseLeave={()=>this.hoverOut(`.picker${u[0]}`)}
                           >
-                            <Input
+                          <Input
+                            autoComplete="off"
                             type='text'
                             id={u[0]}
-                            onChange={(e) => this.setState({
-                              variables: { ...this.state.variables, [u[0]]: e.target.value }
-                            })}
+                            onChange={(e) => {
+                              this.setState({
+                                variables: { ...this.state.variables, [u[0]]: e.target.value }
+                              })
+                            }}
+                            value={this.state.variables[u[0]]}
                           />
                           <TwitterPicker 
-                            colors={this.state.defaultColors}
+                            colors={this.state.pallete}
                             className={`position-absolute d-none picker${u[0]}`}
-                            onChange={ this.handleChange }
-                            onChangeComplete={ ()=>this.updateIt(`#${u[0]}`) }
+                            onChange={({ hex }) => this.handleColor(hex, u[0])}
                           />
                           </div>
                           :
                           <Input
+                          autoComplete="off"
                           type='textarea'
                           onChange={(e) => this.setState({
                             variables: { ...this.state.variables, [u[0]]: e.target.value }
