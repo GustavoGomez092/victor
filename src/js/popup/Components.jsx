@@ -6,7 +6,7 @@ import {
   UncontrolledCollapse,
   Button
 } from 'reactstrap'
-import { db } from '../utils/firebaseInit'
+import { db, fs } from '../utils/firebaseInit'
 
 const components = []
 
@@ -14,7 +14,8 @@ export default class Components extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      compo: null
+      compo: null,
+      update: false
     }
   }
 
@@ -23,19 +24,24 @@ export default class Components extends React.Component {
 
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     await db.collection("fl_content")
       .get()
-      .then(function (querySnapshot) {
-        querySnapshot.forEach(function (doc) {
-          components.push({ id: doc.id, info: doc.data() })
+      .then( (querySnapshot) => {
+        querySnapshot.forEach(async (doc) =>{
+          // query images
+          let data = await db.doc(`fl_files/${doc.data().previewPicture[0].id}`).get()
+          data = data.data()
+          let file = await fs.ref('flamelink/media').child(data.file).getDownloadURL()
+          await components.push({ id: doc.id, info: doc.data(), img: file })
+          this.setState({ compo: components })
         })
       })
       .catch(function (error) {
         console.log("Error getting documents: ", error)
       })
-    await this.setState({ compo: components })
   }
+
 
   render() {
     return (
@@ -47,7 +53,7 @@ export default class Components extends React.Component {
               {
                 this.state.compo
                   ?
-                  this.state.compo.map(x => (
+                  this.state.compo.map((x, i) => (
                     x.info.home == 1
                       ?
                       <Card key={x.id}>
@@ -55,6 +61,7 @@ export default class Components extends React.Component {
                           <Card>
                             <CardHeader><h6 className='d-inline-block'>{x.info.componentName}</h6><span className='float-right'><Button color='success' onClick={() => this.sendToParent(x.id)}>customize</Button></span></CardHeader>
                           </Card>
+                          <img src={`${x.img}`} key={`${x.img}${i}`} style={{ maxWidth: '100%' }} />
                         </CardBody>
                       </Card>
                       :
@@ -73,7 +80,7 @@ export default class Components extends React.Component {
               {
                 this.state.compo
                   ?
-                  this.state.compo.map(x => (
+                  this.state.compo.map((x, i) => (
                     x.info.about == 1
                       ?
                       <Card key={x.id}>
@@ -81,6 +88,7 @@ export default class Components extends React.Component {
                           <Card>
                             <CardHeader><h6 className='d-inline-block'>{x.info.componentName}</h6><span className='float-right'><Button color='success' onClick={() => this.sendToParent(x.id)}>customize</Button></span></CardHeader>
                           </Card>
+                          <img src={`${x.img}`} key={`${x.img}${i}`} style={{ maxWidth: '100%' }} />
                         </CardBody>
                       </Card>
                       :
@@ -99,7 +107,7 @@ export default class Components extends React.Component {
               {
                 this.state.compo
                   ?
-                  this.state.compo.map(x => (
+                  this.state.compo.map((x, i) => (
                     x.info.service == 1
                       ?
                       <Card key={x.id}>
@@ -107,6 +115,7 @@ export default class Components extends React.Component {
                           <Card>
                             <CardHeader><h6 className='d-inline-block'>{x.info.componentName}</h6><span className='float-right'><Button color='success' onClick={() => this.sendToParent(x.id)}>customize</Button></span></CardHeader>
                           </Card>
+                          <img src={`${x.img}`} key={`${x.img}${i}`} style={{ maxWidth: '100%' }} />
                         </CardBody>
                       </Card>
                       :
@@ -124,7 +133,7 @@ export default class Components extends React.Component {
               {
                 this.state.compo
                   ?
-                  this.state.compo.map(x => (
+                  this.state.compo.map((x, i) => (
                     x.info.contact == 1
                       ?
                       <Card key={x.id}>
@@ -132,6 +141,7 @@ export default class Components extends React.Component {
                           <Card>
                             <CardHeader><h6 className='d-inline-block'>{x.info.componentName}</h6><span className='float-right'><Button color='success' onClick={() => this.sendToParent(x.id)}>customize</Button></span></CardHeader>
                           </Card>
+                          <img src={`${x.img}`} key={`${x.img}${i}`} style={{ maxWidth: '100%' }} />
                         </CardBody>
                       </Card>
                       :
@@ -149,7 +159,7 @@ export default class Components extends React.Component {
               {
                 this.state.compo
                   ?
-                  this.state.compo.map(x => (
+                  this.state.compo.map((x, i) => (
                     x.info.gallery == 1
                       ?
                       <Card key={x.id}>
@@ -157,6 +167,7 @@ export default class Components extends React.Component {
                           <Card>
                             <CardHeader><h6 className='d-inline-block'>{x.info.componentName}</h6><span className='float-right'><Button color='success' onClick={() => this.sendToParent(x.id)}>customize</Button></span></CardHeader>
                           </Card>
+                          <img src={`${x.img}`} key={`${x.img}${i}`} style={{ maxWidth: '100%' }} />
                         </CardBody>
                       </Card>
                       :
@@ -174,7 +185,7 @@ export default class Components extends React.Component {
               {
                 this.state.compo
                   ?
-                  this.state.compo.map(x => (
+                  this.state.compo.map((x, i) => (
                     x.info.reviews == 1
                       ?
                       <Card key={x.id}>
@@ -182,6 +193,7 @@ export default class Components extends React.Component {
                           <Card>
                             <CardHeader><h6 className='d-inline-block'>{x.info.componentName}</h6><span className='float-right'><Button color='success' onClick={() => this.sendToParent(x.id)}>customize</Button></span></CardHeader>
                           </Card>
+                          <img src={`${x.img}`} key={`${x.img}${i}`} style={{ maxWidth: '100%' }} />
                         </CardBody>
                       </Card>
                       :

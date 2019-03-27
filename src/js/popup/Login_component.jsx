@@ -21,7 +21,6 @@ class Login extends React.Component {
   async changeLogIn() {
     try {
       var user = await fb.auth().currentUser;
-      console.log(user)
       if (user) {
         await this.setState({ loggedIn: true })
       } else {

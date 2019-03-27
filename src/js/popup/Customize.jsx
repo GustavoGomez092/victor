@@ -10,6 +10,7 @@ import {
   Button
 } from 'reactstrap';
 import { db } from '../utils/firebaseInit'
+import { TwitterPicker } from 'react-color';
 
 export default class Description extends React.Component {
   constructor(props) {
@@ -17,8 +18,13 @@ export default class Description extends React.Component {
     this.state = {
       id: null,
       data: null,
-      variables: null
-    }
+      variables: null,
+      currentPicked: null,
+      defaultColors: ['#D9E3F0', '#F47373', '#697689', '#37D67A', '#2CCCE4', '#555555', '#dce775', '#ff8a65', '#ba68c8']
+    },
+    this.handleChange = (color) => {
+      this.setState({ currentPicked: color.hex })
+    };
   }
 
   async getDoc() {
@@ -70,6 +76,26 @@ export default class Description extends React.Component {
     this.props.customized(data.id, component, data.previewPicture[0].id)
   }
 
+  updateIt(data){
+    document.querySelector(data).value = this.state.currentPicked.split('#').join('') 
+    if(!this.state.defaultColors.includes(this.state.currentPicked)){
+      this.setState({
+        defaultColors: [...this.state.defaultColors, this.state.currentPicked]
+      })
+    }
+  }
+
+  hoverIn(data){
+    document.querySelector(data).classList.remove('d-none')
+    document.querySelector(data).classList.add('d-block')
+  }
+
+  hoverOut(data){
+    document.querySelector(data).classList.remove('d-block')
+    document.querySelector(data).classList.add('d-none')
+  }
+
+
   render() {
     return (
       <React.Fragment>
@@ -89,12 +115,34 @@ export default class Description extends React.Component {
                         return (
                           <React.Fragment key={`${u[0]}${i}`}>
                             <h4>{u[0]}</h4>
+                            { u[0].includes("Color")
+                            ?
+                          <div 
+                          onMouseEnter={()=>this.hoverIn(`.picker${u[0]}`)}
+                            onMouseLeave={()=>this.hoverOut(`.picker${u[0]}`)}
+                          >
                             <Input
-                              type='textarea'
-                              onChange={(e) => this.setState({
-                                variables: { ...this.state.variables, [u[0]]: e.target.value }
-                              })}
-                            />
+                            type='text'
+                            id={u[0]}
+                            onChange={(e) => this.setState({
+                              variables: { ...this.state.variables, [u[0]]: e.target.value }
+                            })}
+                          />
+                          <TwitterPicker 
+                            colors={this.state.defaultColors}
+                            className={`position-absolute d-none picker${u[0]}`}
+                            onChange={ this.handleChange }
+                            onChangeComplete={ ()=>this.updateIt(`#${u[0]}`) }
+                          />
+                          </div>
+                          :
+                          <Input
+                          type='textarea'
+                          onChange={(e) => this.setState({
+                            variables: { ...this.state.variables, [u[0]]: e.target.value }
+                          })}
+                        />
+                              }
                           </React.Fragment>
                         )
                       })
